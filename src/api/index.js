@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = process.env.MEMORIES_SERVICE? process.env.MEMORIES_SERVICE : 'https://memories-app-1221.herokuapp.com/posts';
+const url = process.env.MEMORIES_SERVICE? process.env.MEMORIES_SERVICE : 'http://loclhost:5000/posts';
 
 export const fetchPosts = () => axios.get(url);
 export const creaetPosts = (newPost) => axios.post(url, newPost);
