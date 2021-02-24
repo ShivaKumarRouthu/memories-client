@@ -8,7 +8,6 @@ import { createPost, updatePost } from '../../actions/posts';
 
 const Form = ({ currentId, setCurrentId}) => {
   const defaultPost = {
-    creator: '',
     title: '',
     message: '',
     tags: '',
@@ -18,18 +17,18 @@ const Form = ({ currentId, setCurrentId}) => {
   const dispatch = useDispatch();
   const post = useSelector((state) => state.posts.find((p) => p._id === currentId));
   const [postData, setPostData] = useState(defaultPost);
+  const user = JSON.parse(localStorage.getItem('profile'));
 
   useEffect(() => {
-    console.log(post);
     if(post) setPostData(post);
   }, [post]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if(currentId) {
-      dispatch(updatePost(currentId, postData));
+      dispatch(updatePost(currentId, {...postData,  name: user?.result?.name}));
     } else {
-      dispatch(createPost(postData));
+      dispatch(createPost({...postData,  name: user?.result?.name}));
     }
     setPostData(postData);
     clearForm();
@@ -40,11 +39,19 @@ const Form = ({ currentId, setCurrentId}) => {
     setCurrentId(null);
   }
 
+  if(!user?.result?.name) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant='h6' align='center'>
+          Please Sing In to create new posts
+        </Typography>
+      </Paper>
+    )
+  }
   return (
     <Paper className={classes.paper}>
       <form autoComplete='off' noValidate onSubmit={(e) => handleSubmit(e)} className={`${classes.root} ${classes.form}`}>
         <Typography variant='h6'>{currentId? 'Editing' : 'Creating'} a Memories</Typography>
-        <TextField fullWidth variant='outlined' name='creator' label='Creator' value={postData.creator} onChange={(e) => setPostData({...postData, creator: e.target.value})} />
         <TextField fullWidth variant='outlined' name='title' label='Title' value={postData.title} onChange={(e) => setPostData({...postData, title: e.target.value})} />
         <TextField fullWidth variant='outlined' name='message' label='Message' value={postData.message} onChange={(e) => setPostData({...postData, message: e.target.value})} />
         <TextField fullWidth variant='outlined' name='tags' label='Tags' value={postData.tags} onChange={(e) => setPostData({...postData, tags: e.target.value.split(',')})} />
